@@ -7,6 +7,10 @@
 
 using namespace std;
 
+/*
+Initializes int age and anonymous struct center's ints l,c.
+Creates center for a drop.
+*/
 Drop::Drop()
 {
 	this->age = 0;
@@ -14,35 +18,41 @@ Drop::Drop()
 	this->center.c = (rand() % COLS) + 1;
 }
 
+/*
+Based on age of drop, drop appears in different characters
+and/or strings. Drop age increases by 1.
+*/
 void Drop::Draw()
 {
-	if ((this->age = 0))
+	if ((this->age != 1 && this->age != 2))
 	{
 		mvaddch(this->center.l, this->center.c, 'o');
-		refresh();
-		this_thread::sleep_for(chrono::milliseconds(300));
 	}
-	else if ((this->age = 1))
+	else if ((this->age != 0 && this->age != 2))
+	{
+		mvaddch(this->center.l - 1, this->center.c, '-');
+		mvaddch(this->center.l, this->center.c - 1, '(');
+		mvaddch(this->center.l, this->center.c + 1, ')');
+		mvaddch(this->center.l + 1, this->center.c, '-');
+	}
+	else if ((this->age != 0 && this->age != 1))
 	{
 		mvaddch(this->center.l - 2, this->center.c, '-');
-		mvaddstr(this->center.l, this->center.c - 1, "(  )");
+		mvaddch(this->center.l - 1, this->center.c - 1, '/');
+		mvaddch(this->center.l - 1, this->center.c + 1, '\\');
+		mvaddch(this->center.l, this->center.c - 2, '(');
+		mvaddch(this->center.l, this->center.c + 2, ')');
+		mvaddch(this->center.l + 1, this->center.c - 1, '\\');
+		mvaddch(this->center.l + 1, this->center.c + 1, '/');
 		mvaddch(this->center.l + 2, this->center.c, '-');
-		refresh();
-		this_thread::sleep_for(chrono::milliseconds(300));
 	}
-	else if ((this->age = 2))
-	{
-		mvaddch(this->center.l - 4, this->center.c, '-');
-		mvaddstr(this->center.l - 2, this->center.c - 1, "/ \\");
-		mvaddstr(this->center.l, this->center.c - 3, "(   )");
-		mvaddstr(this->center.l + 2, this->center.c + 1, "\\ /");
-		mvaddch(this->center.l + 4, this->center.c, '-');
-		refresh();
-		this_thread::sleep_for(chrono::milliseconds(300));
-	}
+
 	this->age += 1;
 }
 
+/*
+If drop age is or exeeds MAXIMUM_AGE, bool returns as true.
+*/
 bool Drop::TimeToDie()
 {
 	bool itsTime = false;
@@ -55,13 +65,13 @@ bool Drop::TimeToDie()
 	return itsTime;
 }
 
+/*
+A random amount of drops are generated and added to the
+back of deque drops.
+*/
 void Storm::Birth()
 {
-	int r = rand() % 12;
-	if ((r = 0))
-	{
-		r += 1;
-	}
+	int r = rand() % 11 + 1;
 
 	for (int i = 0; i < r; i++)
 	{
@@ -70,6 +80,10 @@ void Storm::Birth()
 	}
 }
 
+/*
+Iterates through deque drops and calls to Drop::Draw
+to print out each drop in drops.
+*/
 void Storm::Draw()
 {
 	for (size_t i = 0; i < drops.size(); i++)
@@ -78,6 +92,10 @@ void Storm::Draw()
 	}
 }
 
+/*
+If Drop::TimeToDie returns true, front drop in
+deque drops is removed.
+*/
 void Storm::Cull()
 {
 	while (drops.front().TimeToDie())
